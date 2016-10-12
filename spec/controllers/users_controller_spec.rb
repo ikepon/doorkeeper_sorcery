@@ -1,19 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe UsersController, type: :controller do
-
-  describe "GET #create" do
-    it "returns http success" do
-      get :create
-      expect(response).to have_http_status(:success)
-    end
-  end
-
   describe "GET #show" do
+    let!(:application) { create :application }
+    let!(:user) { create :user }
+    let!(:token) { create :access_token, application: application, resource_owner_id: user.id }
+
     it "returns http success" do
-      get :show
+      get :show, { format: :json, access_token: token.token, id: user.id }
       expect(response).to have_http_status(:success)
     end
-  end
 
+    it "returns http fail" do
+      get :show, { format: :json, id: user.id }
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end
